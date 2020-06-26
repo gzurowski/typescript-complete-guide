@@ -1,22 +1,25 @@
 import 'reflect-metadata';
 
-const plane = {
-  color: 'red',
-};
+@controller
+class Plane {
+  color: string = 'red';
 
-// attach metadata to object
-Reflect.defineMetadata('note', 'hi there', plane);
-Reflect.defineMetadata('height', 10, plane);
+  @get('/login')
+  fly(): void {
+    console.log('vrrrrr');
+  }
+}
 
-const note = Reflect.getMetadata('note', plane);
-const height = Reflect.getMetadata('height', plane);
+function get(path: string) {
+  return function (target: Plane, key: string) {
+    Reflect.defineMetadata('path', path, target, key);
+  };
+}
 
-console.log(note);
-console.log(height);
-
-// attach metadata to property
-Reflect.defineMetadata('color-note', 'hi color', plane, 'color');
-
-const colorNote = Reflect.getMetadata('color-note', plane, 'color');
-
-console.log(colorNote);
+function controller(target: typeof Plane) {
+  for (let key in target.prototype) {
+    const path = Reflect.getMetadata('path', target.prototype, key);
+    console.log(path);
+    //router.get(path, target.prototype[key]);
+  }
+}
